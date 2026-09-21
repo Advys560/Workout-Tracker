@@ -105,6 +105,11 @@ const actualizarWorkout = async (req, res) => {
 const modificarWorkout = async (req, res) => {
     try {
         const { id } = req.params;
+        if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({
+        mensaje: "Debes enviar al menos un dato para modificar"
+    });
+}
 
         const resultado = await workoutsModel.modificarWorkout(
             id,
