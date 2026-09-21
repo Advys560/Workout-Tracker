@@ -1,26 +1,12 @@
-const usuarios = [
-  {
-    id: 1,
-    nombre: "Samuel",
-    correo: "samuel@gmail.com",
-  },
-  {
-    id: 2,
-    nombre: "Laura",
-    correo: "laura@gmail.com",
-  },
-  {
-    id: 3,
-    nombre: "Carlos",
-    correo: "carlos@gmail.com",
-  },
-];
+const usersModel = require("../models/usersModel");
 
-function obtenerUsuarios(req, res) {
+async function obtenerUsuarios(req, res) {
+  const usuarios = await usersModel.obtenerTodos();
+
   res.json(usuarios);
 }
 
-function buscarUsuarios(req, res) {
+async function buscarUsuarios(req, res) {
   const nombre = req.query.nombre;
 
   if (!nombre || nombre.trim() === "") {
@@ -29,14 +15,12 @@ function buscarUsuarios(req, res) {
     });
   }
 
-  const usuariosFiltrados = usuarios.filter(
-    (usuario) => usuario.nombre.toLowerCase() === nombre.toLowerCase(),
-  );
+  const usuarios = await usersModel.buscarPorNombre(nombre);
 
-  res.json(usuariosFiltrados);
+  res.json(usuarios);
 }
 
-function limitarUsuarios(req, res) {
+async function limitarUsuarios(req, res) {
   const limit = Number(req.query.limit);
 
   if (!Number.isInteger(limit) || limit <= 0) {
@@ -45,12 +29,12 @@ function limitarUsuarios(req, res) {
     });
   }
 
-  const usuariosLimitados = usuarios.slice(0, limit);
+  const usuarios = await usersModel.obtenerLimitados(limit);
 
-  res.json(usuariosLimitados);
+  res.json(usuarios);
 }
 
-function obtenerUsuarioPorId(req, res) {
+async function obtenerUsuarioPorId(req, res) {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id) || id <= 0) {
@@ -59,7 +43,7 @@ function obtenerUsuarioPorId(req, res) {
     });
   }
 
-  const usuario = usuarios.find((usuario) => usuario.id === id);
+  const usuario = await usersModel.obtenerPorId(id);
 
   if (!usuario) {
     return res.status(404).json({
@@ -70,7 +54,7 @@ function obtenerUsuarioPorId(req, res) {
   res.json(usuario);
 }
 
-function crearUsuario(req, res) {
+async function crearUsuario(req, res) {
   const nombre = req.body ? req.body.nombre : undefined;
   const correo = req.body ? req.body.correo : undefined;
 
@@ -85,31 +69,20 @@ function crearUsuario(req, res) {
     });
   }
 
-  const nuevoUsuario = {
-    id: usuarios.length + 1,
+  const nuevoUsuario = await usersModel.crear({
     nombre: nombre,
     correo: correo,
-  };
-
-  usuarios.push(nuevoUsuario);
+  });
 
   res.status(201).json(nuevoUsuario);
 }
 
-function actualizarUsuario(req, res) {
+async function actualizarUsuario(req, res) {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id) || id <= 0) {
     return res.status(400).json({
       mensaje: "El ID debe ser un número entero válido",
-    });
-  }
-
-  const usuario = usuarios.find((usuario) => usuario.id === id);
-
-  if (!usuario) {
-    return res.status(404).json({
-      mensaje: "Usuario no encontrado",
     });
   }
 
@@ -127,26 +100,23 @@ function actualizarUsuario(req, res) {
     });
   }
 
-  usuario.nombre = nombre;
-  usuario.correo = correo;
+  const usuario = await usersModel.actualizar(id, nombre, correo);
+
+  if (!usuario) {
+    return res.status(404).json({
+      mensaje: "Usuario no encontrado",
+    });
+  }
 
   res.json(usuario);
 }
 
-function actualizarParteUsuario(req, res) {
+async function actualizarParteUsuario(req, res) {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id) || id <= 0) {
     return res.status(400).json({
       mensaje: "El ID debe ser un número entero válido",
-    });
-  }
-
-  const usuario = usuarios.find((usuario) => usuario.id === id);
-
-  if (!usuario) {
-    return res.status(404).json({
-      mensaje: "Usuario no encontrado",
     });
   }
 
@@ -177,18 +147,18 @@ function actualizarParteUsuario(req, res) {
     });
   }
 
-  if (nombre !== undefined) {
-    usuario.nombre = nombre;
-  }
+  const usuario = await usersModel.actualizarParte(id, nombre, correo);
 
-  if (correo !== undefined) {
-    usuario.correo = correo;
+  if (!usuario) {
+    return res.status(404).json({
+      mensaje: "Usuario no encontrado",
+    });
   }
 
   res.json(usuario);
 }
 
-function eliminarUsuario(req, res) {
+async function eliminarUsuario(req, res) {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id) || id <= 0) {
@@ -197,15 +167,13 @@ function eliminarUsuario(req, res) {
     });
   }
 
-  const posicion = usuarios.findIndex((usuario) => usuario.id === id);
+  const usuarioEliminado = await usersModel.eliminar(id);
 
-  if (posicion === -1) {
+  if (!usuarioEliminado) {
     return res.status(404).json({
       mensaje: "Usuario no encontrado",
     });
   }
-
-  usuarios.splice(posicion, 1);
 
   res.status(204).send();
 }
