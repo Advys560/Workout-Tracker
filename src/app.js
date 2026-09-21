@@ -22,8 +22,6 @@ const usuarios = [
   },
 ];
 
-let siguienteId = 4;
-
 app.get("/", (req, res) => {
   res.send("Workout Tracker API funcionando");
 });
@@ -49,6 +47,12 @@ app.get("/users/search", (req, res) => {
 app.get("/users/limit", (req, res) => {
   const limit = Number(req.query.limit);
 
+  if (!Number.isInteger(limit) || limit <= 0) {
+    return res.status(400).json({
+      mensaje: "El límite debe ser un número entero mayor que cero",
+    });
+  }
+
   const usuariosLimitados = usuarios.slice(0, limit);
 
   res.json(usuariosLimitados);
@@ -56,6 +60,12 @@ app.get("/users/limit", (req, res) => {
 
 app.get("/users/:id", (req, res) => {
   const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      mensaje: "El ID debe ser un número entero válido",
+    });
+  }
 
   const usuario = usuarios.find((usuario) => usuario.id === id);
 
@@ -69,8 +79,8 @@ app.get("/users/:id", (req, res) => {
 });
 
 app.post("/users", (req, res) => {
-  const nombre = req.body.nombre;
-  const correo = req.body.correo;
+  const nombre = req.body ? req.body.nombre : undefined;
+  const correo = req.body ? req.body.correo : undefined;
 
   if (
     typeof nombre !== "string" ||
@@ -84,19 +94,25 @@ app.post("/users", (req, res) => {
   }
 
   const nuevoUsuario = {
-    id: siguienteId,
+    id: usuarios.length + 1,
     nombre: nombre,
     correo: correo,
   };
 
   usuarios.push(nuevoUsuario);
-  siguienteId++;
 
   res.status(201).json(nuevoUsuario);
 });
 
 app.put("/users/:id", (req, res) => {
   const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      mensaje: "El ID debe ser un número entero válido",
+    });
+  }
+
   const usuario = usuarios.find((usuario) => usuario.id === id);
 
   if (!usuario) {
@@ -105,8 +121,8 @@ app.put("/users/:id", (req, res) => {
     });
   }
 
-  const nombre = req.body.nombre;
-  const correo = req.body.correo;
+  const nombre = req.body ? req.body.nombre : undefined;
+  const correo = req.body ? req.body.correo : undefined;
 
   if (
     typeof nombre !== "string" ||
@@ -127,6 +143,13 @@ app.put("/users/:id", (req, res) => {
 
 app.patch("/users/:id", (req, res) => {
   const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      mensaje: "El ID debe ser un número entero válido",
+    });
+  }
+
   const usuario = usuarios.find((usuario) => usuario.id === id);
 
   if (!usuario) {
@@ -135,8 +158,8 @@ app.patch("/users/:id", (req, res) => {
     });
   }
 
-  const nombre = req.body.nombre;
-  const correo = req.body.correo;
+  const nombre = req.body ? req.body.nombre : undefined;
+  const correo = req.body ? req.body.correo : undefined;
 
   if (nombre === undefined && correo === undefined) {
     return res.status(400).json({
@@ -175,6 +198,13 @@ app.patch("/users/:id", (req, res) => {
 
 app.delete("/users/:id", (req, res) => {
   const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      mensaje: "El ID debe ser un número entero válido",
+    });
+  }
+
   const posicion = usuarios.findIndex((usuario) => usuario.id === id);
 
   if (posicion === -1) {
@@ -209,6 +239,14 @@ app.get("/api-key", (req, res) => {
 
     res.json({
       mensaje: "Cabecera agregada correctamente",
+    });
+  });
+
+  app.use((error, req, res, next) => {
+    console.error(error);
+
+    res.status(500).json({
+      mensaje: "Ocurrió un error interno en el servidor",
     });
   });
 
