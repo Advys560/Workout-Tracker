@@ -178,6 +178,22 @@ async function eliminarUsuario(req, res) {
   res.status(204).send();
 }
 
+const obtenerWorkoutsPorUsuario = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const workouts = await usersModel.obtenerWorkoutsPorUsuario(id);
+
+        res.status(200).json(workouts);
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            mensaje: "Error al obtener los workouts del usuario"
+        });
+    }
+};
+
 module.exports = {
   obtenerUsuarios,
   buscarUsuarios,
@@ -187,4 +203,6 @@ module.exports = {
   actualizarUsuario,
   actualizarParteUsuario,
   eliminarUsuario,
+  obtenerWorkoutsPorUsuario
 };
+

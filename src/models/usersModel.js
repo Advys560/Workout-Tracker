@@ -81,6 +81,14 @@ async function eliminar(id) {
 
   return resultado.affectedRows > 0;
 }
+const obtenerWorkoutsPorUsuario = async (userId) => {
+    const [rows] = await db.query(
+        "SELECT * FROM workouts WHERE user_id = ?",
+        [userId]
+    );
+
+    return rows;
+};
 
 module.exports = {
   obtenerTodos,
@@ -91,4 +99,5 @@ module.exports = {
   actualizar,
   actualizarParte,
   eliminar,
+  obtenerWorkoutsPorUsuario
 };
