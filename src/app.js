@@ -1,6 +1,8 @@
 const express = require("express");
+
 const usersRouter = require("./routes/users");
 const workoutsRoutes = require("./routes/workouts");
+const exercisesRoutes = require("./routes/exercises");
 
 const app = express();
 
@@ -12,6 +14,7 @@ app.get("/", (req, res) => {
 
 app.use("/users", usersRouter);
 app.use("/workouts", workoutsRoutes);
+app.use("/exercises", exercisesRoutes);
 
 app.get("/headers", (req, res) => {
     const tipoContenido = req.get("Content-Type");
