@@ -38,3 +38,11 @@ CREATE TABLE IF NOT EXISTS exercises (
     repeticiones INT NOT NULL,
     FOREIGN KEY (workout_id) REFERENCES workouts(id)
 );
+
+CREATE TABLE IF NOT EXISTS progress (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    peso DECIMAL(5,2) NOT NULL,
+    fecha DATE NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
