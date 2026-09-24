@@ -29,3 +29,12 @@ CREATE TABLE IF NOT EXISTS workouts (
     fecha DATE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS exercises (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    workout_id INT NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    series INT NOT NULL,
+    repeticiones INT NOT NULL,
+    FOREIGN KEY (workout_id) REFERENCES workouts(id)
+);
